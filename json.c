@@ -78,6 +78,7 @@ struct JsonEntry *json_init_entry() {
     entry->key = NULL;
     entry->value = NULL;
     entry->next = NULL;
+    entry->inferred_type = JSON_UNKNOWN;
     return entry;
 }
 
