@@ -1,5 +1,5 @@
-#ifndef C_JSON_JSON_H
-#define C_JSON_JSON_H
+#ifndef C_JSON_INIT_H
+#define C_JSON_INIT_H
 
 #include <stdint.h>
 
@@ -41,8 +41,10 @@ void json_destroy_array(struct JsonArray *array);
 struct JsonEntry *json_init_entry();
 void json_destroy_entry(struct JsonEntry *entry);
 
+int json_object_add(struct JsonObject *object, struct JsonEntry *entry);
+
 struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length);
 struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length);
 struct JsonEntry *json_parse_entry(unsigned char **data, uint32_t *length);
 
-#endif //C_JSON_JSON_H
+#endif //C_JSON_INIT_H

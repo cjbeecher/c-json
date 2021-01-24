@@ -5,6 +5,7 @@
 
 #define PRIME_VALUE 0x01000193
 #define JSON_BUCKETS 1024
+#define JSON_DEPTH 5
 
 uint32_t defaultHash(const unsigned char *byte, size_t count) {
     const unsigned char *ptr = byte;
@@ -19,6 +20,7 @@ uint32_t defaultHash(const unsigned char *byte, size_t count) {
 uint32_t (*stringHash)(const unsigned char *, size_t) = &defaultHash;
 
 struct JsonObject *json_init_object() {
+    int index;
     struct JsonObject *object;
     uint32_t *sizes = malloc(JSON_BUCKETS * sizeof(uint32_t));
     if (sizes == NULL) return NULL;
@@ -27,8 +29,22 @@ struct JsonObject *json_init_object() {
         free(sizes);
         return NULL;
     }
+    for (index = 0; index < JSON_BUCKETS; index++) {
+        buckets[index] = malloc(JSON_DEPTH * sizeof(struct JsonEntry));
+        if (buckets[index] == NULL) {
+            index--;
+            while (index >= 0) {
+                free(buckets[index]);
+                index--;
+            }
+            free(sizes);
+            free(buckets);
+            return NULL;
+        }
+    }
     object = malloc(sizeof(struct JsonObject));
     if (object == NULL) {
+        for (index = 0; index < JSON_BUCKETS; index++) free(buckets[index]);
         free(sizes);
         free(buckets);
         return NULL;
@@ -41,6 +57,7 @@ struct JsonObject *json_init_object() {
 }
 
 void json_destroy_object(struct JsonObject *object) {
+    int index;
     struct JsonEntry *tmp_entry;
     struct JsonEntry *entry = object->entry;
     while (entry != NULL) {
@@ -48,6 +65,7 @@ void json_destroy_object(struct JsonObject *object) {
         json_destroy_entry(entry);
         entry = tmp_entry;
     }
+    for (index = 0; index < object->bucket_count; index++) free(object->buckets[index]);
     free(object->sizes);
     free(object->buckets);
     free(object);
