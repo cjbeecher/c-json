@@ -11,6 +11,9 @@
 #define JSON_ENTRY_KEY_EXISTS 2
 #define JSON_ENTRY_REALLOC_FAILED 3
 
+#define JSON_ENTRY_REMOVED 0
+#define JSON_ENTRY_NOT_EXISTS 2
+
 #define JSON_UNKNOWN -1
 #define JSON_STRING   0
 #define JSON_INTEGER  1
@@ -22,6 +25,7 @@
 struct JsonEntry {
     char *key;
     void *value;
+    struct JsonEntry *previous;
     struct JsonEntry *next;
     char inferred_type;
     uint32_t value_length;
@@ -50,6 +54,7 @@ struct JsonEntry *json_init_entry();
 void json_destroy_entry(struct JsonEntry *entry);
 
 int json_object_add(struct JsonObject *object, struct JsonEntry *entry);
+int json_object_remove(struct JsonObject *object, const char *key);
 
 struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length);
 struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length);
