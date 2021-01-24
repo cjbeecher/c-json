@@ -3,34 +3,18 @@
 #include <stdlib.h>
 #include "json.h"
 
-#define PRIME_VALUE 0x01000193
-#define JSON_BUCKETS 1024
-#define JSON_DEPTH 5
-
-uint32_t defaultHash(const unsigned char *byte, size_t count) {
-    const unsigned char *ptr = byte;
-    uint32_t hash = 0x811C9DC5;
-    while (count--) {
-        hash = (*ptr ^ hash) * PRIME_VALUE;
-        ptr++;
-    }
-    return hash;
-}
-
-uint32_t (*stringHash)(const unsigned char *, size_t) = &defaultHash;
-
 struct JsonObject *json_init_object() {
     int index;
     struct JsonObject *object;
     uint32_t *sizes = malloc(JSON_BUCKETS * sizeof(uint32_t));
     if (sizes == NULL) return NULL;
-    struct JsonEntry **buckets = malloc(JSON_BUCKETS * sizeof(struct JsonEntry *));
+    struct JsonEntry ***buckets = malloc(JSON_BUCKETS * sizeof(struct JsonEntry **));
     if (buckets == NULL) {
         free(sizes);
         return NULL;
     }
     for (index = 0; index < JSON_BUCKETS; index++) {
-        buckets[index] = malloc(JSON_DEPTH * sizeof(struct JsonEntry));
+        buckets[index] = malloc(JSON_DEPTH * sizeof(struct JsonEntry *));
         if (buckets[index] == NULL) {
             index--;
             while (index >= 0) {

@@ -3,6 +3,14 @@
 
 #include <stdint.h>
 
+#define JSON_BUCKETS 1024
+#define JSON_DEPTH 5
+
+#define JSON_ENTRY_ADDED 0
+#define JSON_ENTRY_KEY_NULL 1
+#define JSON_ENTRY_KEY_EXISTS 2
+#define JSON_ENTRY_REALLOC_FAILED 3
+
 #define JSON_UNKNOWN -1
 #define JSON_STRING   0
 #define JSON_INTEGER  1
@@ -29,7 +37,7 @@ struct JsonArray {
 struct JsonObject {
     uint32_t bucket_count;
     uint32_t *sizes;
-    struct JsonEntry **buckets;
+    struct JsonEntry ***buckets;
     struct JsonEntry *entry;
 };
 
