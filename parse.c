@@ -4,6 +4,7 @@
 #include "json.h"
 
 #define _JSON_KEY_INCREMENT 16
+#define _JSON_STRING_INCREMENT 64
 
 bool _increment_white_space(unsigned char **data, uint32_t *length) {
     while (**data == ' ' || **data == '\t' || **data == '\n' || **data == '\r') {
@@ -66,7 +67,87 @@ char *_json_parse_key(unsigned char **data, uint32_t *length) {
 }
 
 void *_json_parse_string(unsigned char **data, uint32_t *length, char *key) {
-    return NULL;
+    int index = 0;
+    int size = _JSON_STRING_INCREMENT;
+    unsigned char *tmp;
+    unsigned char *value = malloc(_JSON_STRING_INCREMENT * sizeof(char));
+    (*data)++;
+    (*length)--;
+    if (*length == 0) {
+        free(value);
+        return NULL;
+    }
+    while (**data != '"') {
+        if (index > 0 && index % size == 0) {
+            tmp = realloc(value, size + _JSON_KEY_INCREMENT);
+            if (tmp == NULL) {
+                free(value);
+                return NULL;
+            }
+            value = tmp;
+            size += _JSON_KEY_INCREMENT;
+        }
+        switch (**data) {
+            case '\\':
+                (*data)++;
+                (*length)--;
+                if (*length == 0) {
+                    free(value);
+                    return NULL;
+                }
+                switch (**data) {
+                    case 'n':
+                        value[index] = '\n';
+                        index++;
+                        break;
+                    case 'r':
+                        value[index] = '\r';
+                        index++;
+                        break;
+                    case 't':
+                        value[index] = '\t';
+                        index++;
+                        break;
+                    case '"':
+                        value[index] = '"';
+                        index++;
+                        break;
+                    case '\'':
+                        value[index] = '\'';
+                        index++;
+                        break;
+                    default:
+                        free(value);
+                        return NULL;
+                }
+                (*data)++;
+                (*length)--;
+                if (*length == 0) {
+                    free(value);
+                    return NULL;
+                }
+                break;
+            default:
+                value[index] = **data;
+                index++;
+        }
+        (*data)++;
+        (*length)--;
+        if (*length == 0) {
+            free(value);
+            return NULL;
+        }
+    }
+    if (index > 0 && index % size == 0) {
+        tmp = realloc(value, size + _JSON_KEY_INCREMENT);
+        if (tmp == NULL) {
+            free(value);
+            return NULL;
+        }
+        value = tmp;
+    }
+    value[index] = '\0';
+    return value;
 }
 
 void *_json_parse_boolean(unsigned char **data, uint32_t *length, char *key) {
@@ -114,6 +195,10 @@ void *_json_parse_boolean(unsigned char **data, uint32_t *length, char *key) {
         }
     }
     free(value);
+    while (**data != ',' && **data != ' ' && *length > 0) {
+        (*data)++;
+        (*length)--;
+    }
     return NULL;
 }
 
