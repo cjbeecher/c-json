@@ -70,6 +70,50 @@ void *_json_parse_string(unsigned char **data, uint32_t *length, char *key) {
 }
 
 void *_json_parse_boolean(unsigned char **data, uint32_t *length, char *key) {
+    bool *value = malloc(sizeof(bool));
+    if (value == NULL) return NULL;
+    if (**data == 't') {
+        (*data)++;
+        if (**data == 'r') {
+            (*data)++;
+            if (**data == 'u') {
+                (*data)++;
+                if (**data == 'e') {
+                    *value = true;
+                    (*data) += 2;
+                    *length -= 5;
+                    if (*length <= 0) {
+                        free(value);
+                        return NULL;
+                    }
+                    return value;
+                }
+            }
+        }
+    }
+    else if (**data == 'f') {
+        (*data)++;
+        if (**data == 'a') {
+            (*data)++;
+            if (**data == 'l') {
+                (*data)++;
+                if (**data == 's') {
+                    (*data)++;
+                    if (**data == 'e') {
+                        *value = false;
+                        (*data) += 2;
+                        *length -= 6;
+                        if (*length <= 0) {
+                            free(value);
+                            return NULL;
+                        }
+                        return value;
+                    }
+                }
+            }
+        }
+    }
+    free(value);
     return NULL;
 }
 
