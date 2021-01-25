@@ -394,6 +394,26 @@ struct JsonEntry *json_parse_entry(unsigned char **data, uint32_t *length) {
                 entry->value = value;
                 entry->inferred_type = JSON_STRING;
                 return entry;
+            case 'n':
+                (*data)++;
+                (*length)--;
+                if (*length == 0) return NULL;
+                if (**data != 'u') return NULL;
+                (*data)++;
+                (*length)--;
+                if (*length == 0) return NULL;
+                if (**data != 'l') return NULL;
+                (*data)++;
+                (*length)--;
+                if (*length == 0) return NULL;
+                if (**data != 'l') return NULL;
+                (*data)++;
+                (*length)--;
+                if (*length == 0) return NULL;
+                entry = json_init_entry();
+                if (entry == NULL) return NULL;
+                entry->inferred_type = JSON_NULL;
+                return entry;
             case '-':
                 negative = true;
             case '0':
