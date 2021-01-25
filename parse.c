@@ -74,7 +74,42 @@ void *_json_parse_boolean(unsigned char **data, uint32_t *length, char *key) {
 }
 
 void *_json_parse_number(unsigned char **data, uint32_t *length, char *key, bool negative) {
-    return NULL;
+    unsigned char tmp;
+    double *value = malloc(sizeof(double));
+    if (value == NULL) return NULL;
+    int increment = 0;
+    bool done = false;
+    while (!done) {
+        switch ((*data)[increment]) {
+            case '0':
+            case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
+            case '8':
+            case '9':
+            case 'e':
+            case '-':
+                increment++;
+                continue;
+            default:
+                done = true;
+        }
+    }
+    tmp = (*data)[increment];
+    (*data)[increment] = '\0';
+    *value = strtod((const char *)*data, NULL);
+    *data += increment;
+    **data = tmp;
+    *length -= increment;
+    if (*length == 0) {
+        free(value);
+        return NULL;
+    }
+    return value;
 }
 
 struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length) {
