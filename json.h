@@ -10,6 +10,8 @@
 #define JSON_ENTRY_KEY_NULL 1
 #define JSON_ENTRY_KEY_EXISTS 2
 #define JSON_ENTRY_REALLOC_FAILED 3
+#define JSON_ENTRY_KEY_NOT_NULL 4
+#define JSON_ENTRY_OUT_OF_BOUNDS 5
 
 #define JSON_ENTRY_REMOVED 0
 #define JSON_ENTRY_NOT_EXISTS 2
@@ -55,6 +57,8 @@ void json_destroy_entry(struct JsonEntry *entry);
 
 int json_object_add(struct JsonObject *object, struct JsonEntry *entry);
 int json_object_remove(struct JsonObject *object, const char *key);
+int json_array_add(struct JsonArray *array, struct JsonEntry *entry);
+int json_array_remove(struct JsonArray *array, size_t index);
 
 struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length);
 struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length);

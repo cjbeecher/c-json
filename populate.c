@@ -72,3 +72,25 @@ int json_object_remove(struct JsonObject *object, const char *key) {
     json_destroy_entry(entry);
     return JSON_ENTRY_REMOVED;
 }
+
+int json_array_add(struct JsonArray *array, struct JsonEntry *entry) {
+    struct JsonEntry **entries;
+    if (entry->key != NULL) return JSON_ENTRY_KEY_NOT_NULL;
+    if (array->size == array->capacity) {
+        entries = realloc(array->items, array->capacity + JSON_BUCKETS);
+        if (entries == NULL) return JSON_ENTRY_REALLOC_FAILED;
+        array->items = entries;
+        array->capacity += JSON_BUCKETS;
+    }
+    array->items[array->size] = entry;
+    array->size++;
+    return JSON_ENTRY_ADDED;
+}
+
+int json_array_remove(struct JsonArray *array, size_t index) {
+    if (index >= array->size) return JSON_ENTRY_OUT_OF_BOUNDS;
+    json_destroy_entry(array->items[index]);
+    array->items[index] = array->items[--array->size];
+    array->items[array->size] = NULL;
+    return JSON_ENTRY_REMOVED;
+}
