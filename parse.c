@@ -67,6 +67,12 @@ void *_json_parse_number(unsigned char **data, uint32_t *length, char *key, bool
     return NULL;
 }
 
+struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length) {
+    struct JsonArray *array = json_init_array();
+    if (array == NULL) return NULL;
+    return array;
+}
+
 struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
     char *key = NULL;
     struct JsonEntry *entry = NULL;
@@ -115,6 +121,24 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
         entry->key = key;
         if (json_object_add(object, entry) != JSON_ENTRY_ADDED) {
             json_destroy_entry(entry);
+            json_destroy_object(object);
+            return NULL;
+        }
+        while (**data == ' ' || **data == '\t' || **data == '\n' || **data == '\r') {
+            (*data)++;
+            (*length)--;
+            if (*length == 0) {
+                json_destroy_object(object);
+                return NULL;
+            }
+        }
+        if (**data != ',' || **data != '}' || *length == 0) {
+            json_destroy_object(object);
+            return NULL;
+        }
+        (*data)++;
+        (*length)--;
+        if (*length == 0) {
             json_destroy_object(object);
             return NULL;
         }
