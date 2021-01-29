@@ -310,7 +310,10 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
             return NULL;
         }
         key = _json_parse_key(data, length);
-        if (key == NULL) return NULL;
+        if (key == NULL) {
+            json_destroy_object(object);
+            return NULL;
+        }
         if (*length == 0) {
             free(key);
             json_destroy_object(object);

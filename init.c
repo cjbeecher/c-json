@@ -25,6 +25,7 @@ struct JsonObject *json_init_object() {
             free(buckets);
             return NULL;
         }
+        sizes[index] = JSON_DEPTH;
     }
     object = malloc(sizeof(struct JsonObject));
     if (object == NULL) {
