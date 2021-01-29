@@ -25,10 +25,6 @@ char *_json_parse_key(unsigned char **data, uint32_t *length) {
     (*length)--;
     (*data)++;
     while (*length > 0 && **data != '"') {
-        if (**data != ' ' && **data != '\t' && **data != '\n' && **data != '\r') {
-            free(key);
-            return NULL;
-        }
         key[index] = (char)**data;
         if ((index + 1) % _JSON_KEY_INCREMENT == 0) {
             tmp = realloc(key, _JSON_KEY_INCREMENT * (index + 1));

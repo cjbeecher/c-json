@@ -8,11 +8,13 @@ int main() {
     unsigned char valid_json1[] = "{\"key\": 1}";
     ptr = (unsigned char *)valid_json1;
     struct JsonEntry *entry = json_parse_entry(&ptr, &length);
-    if (entry == NULL)
-        printf("Error parsing JSON");
+    if (entry == NULL) {
+        printf("Error parsing JSON\n");
+        printf("Position: %i\n", length);
+    }
     else {
         json_destroy_entry(entry);
-        printf("Successfully parsed JSON");
+        printf("Successfully parsed JSON\n");
     }
     return 0;
 }
