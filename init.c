@@ -6,15 +6,15 @@
 struct JsonObject *json_init_object() {
     int index;
     struct JsonObject *object;
-    uint32_t *sizes = malloc(JSON_BUCKETS * sizeof(uint32_t));
+    uint32_t *sizes = calloc(JSON_BUCKETS, sizeof(uint32_t));
     if (sizes == NULL) return NULL;
-    struct JsonEntry ***buckets = malloc(JSON_BUCKETS * sizeof(struct JsonEntry **));
+    struct JsonEntry ***buckets = calloc(JSON_BUCKETS, sizeof(struct JsonEntry **));
     if (buckets == NULL) {
         free(sizes);
         return NULL;
     }
     for (index = 0; index < JSON_BUCKETS; index++) {
-        buckets[index] = malloc(JSON_DEPTH * sizeof(struct JsonEntry *));
+        buckets[index] = calloc(JSON_DEPTH, sizeof(struct JsonEntry *));
         if (buckets[index] == NULL) {
             index--;
             while (index >= 0) {
