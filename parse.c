@@ -241,13 +241,13 @@ struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length) {
     struct JsonEntry *entry = NULL;
     struct JsonArray *array = json_init_array();
     if (array == NULL) return NULL;
-    (*data)++;
-    (*length)--;
-    if (*length == 0) {
-        json_destroy_array(array);
-        return NULL;
-    }
     while (*length > 0 && **data != ']') {
+        (*data)++;
+        (*length)--;
+        if (*length == 0) {
+            json_destroy_array(array);
+            return NULL;
+        }
         if (!_increment_white_space(data, length)) {
             json_destroy_array(array);
             return NULL;
@@ -277,12 +277,6 @@ struct JsonArray *json_parse_array(unsigned char **data, uint32_t *length) {
             return NULL;
         }
     }
-    (*data)++;
-    (*length)--;
-    if (*length == 0) {
-        json_destroy_array(array);
-        return NULL;
-    }
     return array;
 }
 
@@ -294,13 +288,13 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
         json_destroy_object(object);
         return NULL;
     }
-    (*data)++;
-    (*length)--;
-    if (*length == 0) {
-        json_destroy_object(object);
-        return NULL;
-    }
      while (*length > 0 && **data != '}') {
+         (*data)++;
+         (*length)--;
+         if (*length == 0) {
+             json_destroy_object(object);
+             return NULL;
+         }
         if (!_increment_white_space(data, length) || **data != '"') {
             json_destroy_object(object);
             return NULL;
@@ -336,8 +330,6 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
             json_destroy_object(object);
             return NULL;
         }
-        (*data)++;
-        (*length)--;
     }
     return object;
 }
