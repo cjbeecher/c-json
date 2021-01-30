@@ -3,7 +3,7 @@
 #include "json.h"
 
 int main() {
-    uint32_t length = 11;
+    uint32_t length = 10;
     unsigned char *ptr;
     unsigned char valid_json1[] = "{\"key\": 1}";
     ptr = (unsigned char *)valid_json1;

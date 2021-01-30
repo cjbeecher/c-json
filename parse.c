@@ -300,7 +300,7 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
         json_destroy_object(object);
         return NULL;
     }
-    while (*length > 0 && **data != '}') {
+     while (*length > 0 && **data != '}') {
         if (!_increment_white_space(data, length) || **data != '"') {
             json_destroy_object(object);
             return NULL;
@@ -332,22 +332,12 @@ struct JsonObject *json_parse_object(unsigned char **data, uint32_t *length) {
             json_destroy_object(object);
             return NULL;
         }
-        if (!_increment_white_space(data, length) || **data != ',' || **data != '}' || *length == 0) {
+        if (!(_increment_white_space(data, length) || **data == ',' || **data == '}' || *length != 0)) {
             json_destroy_object(object);
             return NULL;
         }
         (*data)++;
         (*length)--;
-        if (*length == 0) {
-            json_destroy_object(object);
-            return NULL;
-        }
-    }
-    (*data)++;
-    (*length)--;
-    if (*length == 0) {
-        json_destroy_object(object);
-        return NULL;
     }
     return object;
 }
@@ -428,9 +418,12 @@ struct JsonEntry *json_parse_entry(unsigned char **data, uint32_t *length) {
                 value = _json_parse_number(data, length, NULL, negative);
                 if (value == NULL) return NULL;
                 entry = json_init_entry();
-                if (entry == NULL) return NULL;
+                if (entry == NULL) {
+                    free(value);
+                    return NULL;
+                }
                 entry->value = value;
-                entry->inferred_type = JSON_STRING;
+                entry->inferred_type = JSON_FLOAT;
                 return entry;
             case ' ':
             case '\n':

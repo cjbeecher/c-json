@@ -39,10 +39,17 @@ int json_object_add(struct JsonObject *object, struct JsonEntry *entry) {
         object->sizes[bucket] += JSON_DEPTH;
         size += JSON_DEPTH;
     }
-    object->buckets[bucket][size] = entry;
-    entry->next = object->buckets[bucket][size]->next;
-    object->buckets[bucket][size]->next = entry;
-    entry->next->previous = entry;
+    if (object->entry == NULL) {
+        object->entry = entry;
+        entry->previous = NULL;
+        entry->next = NULL;
+    }
+    else {
+        object->buckets[bucket][size] = entry;
+        entry->next = object->buckets[bucket][size]->next;
+        object->buckets[bucket][size]->next = entry;
+        entry->next->previous = entry;
+    }
     return JSON_ENTRY_ADDED;
 }
 

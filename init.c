@@ -92,7 +92,7 @@ void json_destroy_entry(struct JsonEntry *entry) {
         else if (entry->inferred_type == JSON_ARRAY)
             json_destroy_array((struct JsonArray *) entry->value);
         else
-            json_destroy_entry((struct JsonEntry *) entry->value);
+            free(entry->value);
     }
     if (entry->key != NULL) {
         free(entry->key);
