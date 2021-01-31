@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdint.h>
+#include <string.h>
 #include <stdbool.h>
 #include "json.h"
 
@@ -23,13 +24,13 @@ int main() {
     unsigned char valid_json1[] = "{\"key\": 1}";
     unsigned char valid_json2[] = "{\"key\": {\"subKey\": 2}}";
     // valid_json1 test
-    length = 11;
+    length = strlen((const char *)valid_json1) + 1;
     ptr = (unsigned char *)valid_json1;
     entry = json_parse_entry(&ptr, &length);
     if (null_check(entry, length, (char *)valid_json1))
         json_destroy_entry(entry);
     // valid_json2 test
-    length = 23;
+    length = strlen((const char *)valid_json2) + 1;
     ptr = (unsigned char *)valid_json2;
     entry = json_parse_entry(&ptr, &length);
     if (null_check(entry, length, (char *)valid_json2)) {
