@@ -67,16 +67,15 @@ int main() {
     if (null_check(entry, length, (char *)valid_json3)) {
         tmp_object = JSON_TO_OBJECT(entry);
         tmp_entry = json_object_get(tmp_object, "ke\"y");
-        if (tmp_entry != tmp_object->entry)
+        if (tmp_entry != tmp_object->entry->next)
             printf("object=valid3|key=ke\"y|entry=null\n");
-        else {
-            printf("object=valid3|key=ke\"y|value=%s\n", JSON_TO_STRING(tmp_entry));
-        }
+        else
+            printf("object=valid3|key=ke\"y|type=%i|value=%s\n", tmp_entry->inferred_type, JSON_TO_STRING(tmp_entry));
         tmp_entry = json_object_get(tmp_object, "two");
         if (tmp_entry != tmp_object->entry)
             printf("object=valid3|key=two|entry=null\n");
         else {
-            printf("object=valid3|key=two|value=%s\n", JSON_TO_STRING(tmp_entry));
+            printf("object=valid3|key=two|type=%i|value=%s\n", tmp_entry->inferred_type, JSON_TO_STRING(tmp_entry));
         }
         json_destroy_entry(entry);
     }
