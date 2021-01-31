@@ -218,6 +218,7 @@ void *_json_parse_number(unsigned char **data, uint32_t *length, char *key, bool
             case '9':
             case 'e':
             case '-':
+            case '.':
                 increment++;
                 continue;
             default:

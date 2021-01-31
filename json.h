@@ -24,6 +24,9 @@
 #define JSON_ARRAY    4
 #define JSON_NULL     5
 
+#define JSON_TO_OBJECT(entry) (struct JsonObject *)entry->value
+#define JSON_TO_DOUBLE(entry) *(double *)entry->value
+
 struct JsonEntry {
     char *key;
     void *value;
@@ -47,7 +50,7 @@ struct JsonObject {
     struct JsonEntry *entry;
 };
 
-void json_set_default_hash(uint32_t (*stringHash)(const unsigned char *, size_t));
+void json_set_default_hash(uint32_t (*stringHash)(const char *, size_t));
 struct JsonObject *json_init_object();
 void json_destroy_object(struct JsonObject *object);
 struct JsonArray *json_init_array();
@@ -56,6 +59,7 @@ struct JsonEntry *json_init_entry();
 void json_destroy_entry(struct JsonEntry *entry);
 
 int json_object_add(struct JsonObject *object, struct JsonEntry *entry);
+struct JsonEntry *json_object_get(struct JsonObject *object, const char *key);
 int json_object_remove(struct JsonObject *object, const char *key);
 int json_array_add(struct JsonArray *array, struct JsonEntry *entry);
 int json_array_remove(struct JsonArray *array, size_t index);

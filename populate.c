@@ -6,8 +6,8 @@
 
 #define PRIME_VALUE 0x01000193
 
-uint32_t defaultHash(const unsigned char *byte, size_t count) {
-    const unsigned char *ptr = byte;
+uint32_t defaultHash(const char *byte, size_t count) {
+    const char *ptr = byte;
     uint32_t hash = 0x811C9DC5;
     while (count--) {
         hash = (*ptr ^ hash) * PRIME_VALUE;
@@ -16,14 +16,14 @@ uint32_t defaultHash(const unsigned char *byte, size_t count) {
     return hash;
 }
 
-uint32_t (*stringHash)(const unsigned char *, size_t) = &defaultHash;
+uint32_t (*stringHash)(const char *, size_t) = &defaultHash;
 
 int json_object_add(struct JsonObject *object, struct JsonEntry *entry) {
     uint32_t bucket;
     uint32_t size;
     struct JsonEntry **tmp_buckets;
     if (entry->key == NULL) return JSON_ENTRY_KEY_NULL;
-    bucket = (*stringHash)((const unsigned char *)entry->key, strlen(entry->key)) % object->bucket_count;
+    bucket = (*stringHash)((const char *)entry->key, strlen(entry->key)) % object->bucket_count;
     size = object->sizes[bucket] - 1;
     while (size >= 0) {
         if (object->buckets[bucket][size] == NULL) {
@@ -53,12 +53,25 @@ int json_object_add(struct JsonObject *object, struct JsonEntry *entry) {
     return JSON_ENTRY_ADDED;
 }
 
+struct JsonEntry *json_object_get(struct JsonObject *object, const char *key) {
+    uint32_t bucket = (*stringHash)((const char *)key, strlen(key)) % object->bucket_count;
+    uint32_t size = object->sizes[bucket] - 1;
+    while (size >= 0) {
+        if (object->buckets[bucket][size] == NULL) return NULL;
+        if (strcmp(object->buckets[bucket][size]->key, key) == 0) {
+            return object->buckets[bucket][size];
+        }
+        size--;
+    }
+    return NULL;
+}
+
 int json_object_remove(struct JsonObject *object, const char *key) {
     uint32_t size;
     uint32_t bucket;
     struct JsonEntry *entry = NULL;
     if (key == NULL) return JSON_ENTRY_KEY_NULL;
-    bucket = (*stringHash)((const unsigned char *)key, strlen(key)) % object->bucket_count;
+    bucket = (*stringHash)((const char *)key, strlen(key)) % object->bucket_count;
     size = object->sizes[bucket] - 1;
     while (size >= 0) {
         if (object->buckets[bucket][size] == NULL) return JSON_ENTRY_NOT_EXISTS;
