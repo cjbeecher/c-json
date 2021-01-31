@@ -19,13 +19,50 @@ bool _increment_white_space(unsigned char **data, uint32_t *length) {
 char *_json_parse_key(unsigned char **data, uint32_t *length) {
     int index = 0;
     char *tmp;
+    char value;
     char *key = malloc(_JSON_KEY_INCREMENT * sizeof(char));
     if (key == NULL) return NULL;
     key[index] = '\0';
     (*length)--;
     (*data)++;
     while (*length > 0 && **data != '"') {
-        key[index] = (char)**data;
+        value = (char)**data;
+        if (value == '\\') {
+            (*length)--;
+            (*data)++;
+            value = (char)**data;
+            // TODO : add support for UTF-8 on key
+            switch (value) {
+                case '"':
+                    value = '"';
+                    break;
+                case 'n':
+                    value = '\n';
+                    break;
+                case 't':
+                    value = '\t';
+                    break;
+                case 'r':
+                    value = '\r';
+                    break;
+                case '\\':
+                    value = '\\';
+                    break;
+                case 'f':
+                    value = '\f';
+                    break;
+                case 'b':
+                    value = '\b';
+                    break;
+                case '/':
+                    value = '/';
+                    break;
+                default:
+                    free(key);
+                    return NULL;
+            }
+        }
+        key[index] = value;
         if ((index + 1) % _JSON_KEY_INCREMENT == 0) {
             tmp = realloc(key, _JSON_KEY_INCREMENT * (index + 1));
             if (tmp == NULL) {
@@ -83,6 +120,7 @@ void *_json_parse_string(unsigned char **data, uint32_t *length, char *key) {
             value = tmp;
             size += _JSON_KEY_INCREMENT;
         }
+        // TODO : add support for UTF-8 on key
         switch (**data) {
             case '\\':
                 (*data)++;
@@ -110,6 +148,18 @@ void *_json_parse_string(unsigned char **data, uint32_t *length, char *key) {
                         break;
                     case '\'':
                         value[index] = '\'';
+                        index++;
+                        break;
+                    case 'f':
+                        value[index] = '\f';
+                        index++;
+                        break;
+                    case 'b':
+                        value[index] = '\b';
+                        index++;
+                        break;
+                    case '/':
+                        value[index] = '/';
                         index++;
                         break;
                     default:
@@ -143,6 +193,12 @@ void *_json_parse_string(unsigned char **data, uint32_t *length, char *key) {
         value = tmp;
     }
     value[index] = '\0';
+    (*data)++;
+    (*length)--;
+    if (*length == 0) {
+        free(value);
+        return NULL;
+    }
     return value;
 }
 

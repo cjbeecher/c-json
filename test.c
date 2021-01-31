@@ -23,6 +23,7 @@ int main() {
     struct JsonObject *tmp_object;
     unsigned char valid_json1[] = "{\"key\": 1}";
     unsigned char valid_json2[] = "{\"key\": {\"subKey\": 2}}";
+    unsigned char valid_json3[] = "  {\t\"ke\\\"y\" : \"abc\"   ,\"two\" :\"2\"  }";
     // valid_json1 test
     length = strlen((const char *)valid_json1) + 1;
     ptr = (unsigned char *)valid_json1;
@@ -57,6 +58,26 @@ int main() {
         }
         else
             printf("object=valid2|key=key|entry=null\n");
+        json_destroy_entry(entry);
+    }
+    // valid_json3 test
+    length = strlen((const char *)valid_json3);
+    ptr = (unsigned char *)valid_json3;
+    entry = json_parse_entry(&ptr, &length);
+    if (null_check(entry, length, (char *)valid_json3)) {
+        tmp_object = JSON_TO_OBJECT(entry);
+        tmp_entry = json_object_get(tmp_object, "ke\"y");
+        if (tmp_entry != tmp_object->entry)
+            printf("object=valid3|key=ke\"y|entry=null\n");
+        else {
+            printf("object=valid3|key=ke\"y|value=%s\n", JSON_TO_STRING(tmp_entry));
+        }
+        tmp_entry = json_object_get(tmp_object, "two");
+        if (tmp_entry != tmp_object->entry)
+            printf("object=valid3|key=two|entry=null\n");
+        else {
+            printf("object=valid3|key=two|value=%s\n", JSON_TO_STRING(tmp_entry));
+        }
         json_destroy_entry(entry);
     }
     return 0;

@@ -20,16 +20,15 @@ uint32_t (*stringHash)(const char *, size_t) = &defaultHash;
 
 int json_object_add(struct JsonObject *object, struct JsonEntry *entry) {
     uint32_t bucket;
-    uint32_t size;
+    int32_t size;
+    struct JsonEntry *tmp_entry;
     struct JsonEntry **tmp_buckets;
     if (entry->key == NULL) return JSON_ENTRY_KEY_NULL;
     bucket = (*stringHash)((const char *)entry->key, strlen(entry->key)) % object->bucket_count;
     size = object->sizes[bucket] - 1;
     while (size >= 0) {
-        if (object->buckets[bucket][size] == NULL) {
-            object->buckets[bucket][size] = entry;
+        if (object->buckets[bucket][size] == NULL)
             break;
-        }
         if (strcmp(object->buckets[bucket][size]->key, entry->key) == 0) return JSON_ENTRY_KEY_EXISTS;
         size--;
     }
@@ -45,11 +44,12 @@ int json_object_add(struct JsonObject *object, struct JsonEntry *entry) {
         entry->next = NULL;
     }
     else {
-        object->buckets[bucket][size] = entry;
-        entry->next = object->buckets[bucket][size]->next;
-        object->buckets[bucket][size]->next = entry;
-        entry->next->previous = entry;
+        tmp_entry = object->entry;
+        entry->next = tmp_entry;
+        tmp_entry->previous = entry;
+        object->entry = entry;
     }
+    object->buckets[bucket][size] = entry;
     return JSON_ENTRY_ADDED;
 }
 

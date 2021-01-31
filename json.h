@@ -26,6 +26,7 @@
 
 #define JSON_TO_OBJECT(entry) (struct JsonObject *)entry->value
 #define JSON_TO_DOUBLE(entry) *(double *)entry->value
+#define JSON_TO_STRING(entry) (char *)entry->value
 
 struct JsonEntry {
     char *key;
